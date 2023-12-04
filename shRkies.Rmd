@@ -16,7 +16,8 @@ library(MuMIn)
 Does change in surface water temperature affect shark migration patterns?
 
 ```{r}
-
+tigershark <- read.csv("Regularized_tiger_shark_tracks.csv")
+view(tigershark) #years range: 2010-2019
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
