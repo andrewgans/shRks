@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(MuMIn)
+library(rgbif)
+library(data.table)
 ```
 
 #Question:
@@ -18,6 +20,44 @@ Does change in surface water temperature affect shark migration patterns?
 ```{r}
 tigershark <- read.csv("Regularized_tiger_shark_tracks.csv")
 view(tigershark) #years range: 2010-2019
+
+spp <- c("Carcharodon carcharias", "Galeocerdo cuvier", "Carcharinus leucas")
+y <- paste0("1990",",","2019")
+m <- paste0("6",",","10")
+
+dat.l <-list()
+
+for(s in spp){
+  n.obs <-  occ_data(scientificName = s, year = y, month = m, limit = 0, country="US", basisOfRecord = "HUMAN_OBSERVATION")$meta$count 
+
+dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
+                               limit=n.obs, country="US",
+                               basisOfRecord = "HUMAN_OBSERVATION",)[[2]]
+
+}
+
+dat <- rbindlist(dat.l,fill=T)
+
+dat%>%
+  group_by(year,species)%>%
+  summarise(count=sum(individualCount,na.rm = T))%>%
+  ggplot(aes(x=year,y=count,col=species))+geom_point()
+
+
+
+shortmako <- occ_data(scientificName = "Isurus oxyrinchus", continent = "NORTH_AMERICA", limit=1000, basisOfRecord = "HUMAN_OBSERVATION")[[2]]
+
+
+shortmako%>%
+  group_by(year)%>%
+  summarise(count=sum(individualCount,na.rm = T))%>%
+  ggplot(aes(x=year,y=count))+geom_point()
+
+view(shortmako)
+```
+
+```{r spatial analysis}
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
