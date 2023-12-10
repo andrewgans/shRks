@@ -25,8 +25,19 @@ Used "measure a distance" tool in google maps to determine a rectangle encompass
 # Determining species that are migratory and pass through this region:
 
 ```{r finding potential species}
-potspp <- occ_data(scientificName = "Elasmobranchii", basisOfRecord = "HUMAN_OBSERVATION", year = "2000","2023", )
-potspp
+
+potspp <- occ_data(scientificName = "Elasmobranchii", 
+                   basisOfRecord = "HUMAN_OBSERVATION", 
+                   year = "2000,2023",
+                   decimalLatitude = "41.0,45.0", 
+                   decimalLongitude = "-71.0,-66.0", 
+                   )[[2]]
+potspp %>%
+  select(scientificName) %>%
+  unique() %>%
+  print()
+
+#returns only one spp of sharks --> spurdogs (type of dogfish) - need to expand the area?
 ```
 
 
