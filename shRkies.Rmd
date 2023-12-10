@@ -3,6 +3,7 @@ title: "sharkie"
 author: "shRks"
 date: "2023-12-04"
 output: html_document
+bibliography: "shRks.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -15,16 +16,17 @@ library(data.table)
 
 #Question:
 
-Does change in surface water temperature affect shark migration patterns?
+Does change in surface water temperature affect shark migration patterns? 
 
 # Delineating the area of interest:
 
 Used "measure a distance" tool in google maps to determine a rectangle encompassing the region we were interested in (see screenshot) Bottom left coordinates: 41.02923, -71.72927 Top left coordinates: 45.11812, -71.74585 Top right coordinates: 45.11812, -66.06430 Bottom right coordinates: 40.99269, -66.12886
 
 ![Screenshot of region of interest](northeastregion.png)
-# Determining species that are migratory and pass through this region:
 
-```{r finding potential species}
+## Determining species that are migratory and pass through this region:
+
+```{r finding potential species, include = FALSE}
 
 potspp <- occ_data(scientificName = "Elasmobranchii", 
                    basisOfRecord = "HUMAN_OBSERVATION", 
@@ -36,33 +38,41 @@ potspp %>%
   select(scientificName) %>%
   unique() %>%
   print()
-
-#returns in terms of sharks:
-# Cetorhinus maximus (basking shark)
-# Isurus oxyrinchus (shortfin mako)
-# Mustelus canis (smooth dogfish)
-# Lamna nasus (porbeagle)
-# Squalus acanthias (spurdog)
-# Carcharias taurus (sand tiger shark)
-# Carcharhinus plumbeus (sandbar shark)
-# Carcharodon carcharias (great white shark)
-# Prionace glauca (blue shark)
-# Carcharhinus obscurus (dusky shark)
-# Sphyrnidae (hammerhead sharks - family)
-# Carcharhinidae (requiem sharks - family)
 ```
+
+#### Occurence data indicates that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration):
+
+Cetorhinus maximus (basking shark)
+
+Isurus oxyrinchus (shortfin mako)
+
+Mustelus canis (smooth dogfish)
+
+Lamna nasus (porbeagle)
+
+Squalus acanthias (spurdog)
+
+Carcharias taurus (sand tiger shark)
+
+Carcharhinus plumbeus (sandbar shark)
+
+Carcharodon carcharias (great white shark)
+
+Prionace glauca (blue shark)
+
+Carcharhinus obscurus (dusky shark)
 
 
 
 ```{r}
-spp <- c("Carcharodon carcharias", "Galeocerdo cuvier", "Carcharinus leucas")
-y <- paste0("1990",",","2019")
-m <- paste0("6",",","10")
+spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
+y <- paste0("2000",",","2023")
+m <- paste0("5",",","9")
 
 dat.l <-list()
 
 for(s in spp){
-  n.obs <-  occ_data(scientificName = s, year = y, month = m, limit = 0, country="US", basisOfRecord = "HUMAN_OBSERVATION")$meta$count 
+  n.obs <-  occ_data(scientificName = s, year = y, month = m, limit = 1000, country="US", basisOfRecord = "HUMAN_OBSERVATION")$meta$count 
 
 dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
                                limit=n.obs, country="US",
@@ -77,21 +87,13 @@ dat%>%
   summarise(count=sum(individualCount,na.rm = T))%>%
   ggplot(aes(x=year,y=count,col=species))+geom_point()
 
-
-
-shortmako <- occ_data(scientificName = "Isurus oxyrinchus", continent = "NORTH_AMERICA", limit=1000, basisOfRecord = "HUMAN_OBSERVATION")[[2]]
-
-
-shortmako%>%
-  group_by(year)%>%
-  summarise(count=sum(individualCount,na.rm = T))%>%
-  ggplot(aes(x=year,y=count))+geom_point()
-
-view(shortmako)
 ```
 
 ```{r spatial analysis}
 
 ```
+
+
+## References
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
