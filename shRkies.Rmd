@@ -75,8 +75,11 @@ for(s in spp){
   n.obs <-  occ_data(scientificName = s, year = y, month = m, limit = 1000, country="US", basisOfRecord = "HUMAN_OBSERVATION")$meta$count 
 
 dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
-                               limit=n.obs, country="US",
-                               basisOfRecord = "HUMAN_OBSERVATION",)[[2]]
+                               limit=1000, country="US",
+                               basisOfRecord = "HUMAN_OBSERVATION", 
+                               decimalLatitude = "41.0,45.0", 
+                               decimalLongitude = "-71.0,-66.0", 
+                   )[[2]]
 
 }
 
