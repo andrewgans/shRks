@@ -37,7 +37,19 @@ potspp %>%
   unique() %>%
   print()
 
-#returns only one spp of sharks --> spurdogs (type of dogfish) - need to expand the area?
+#returns in terms of sharks:
+# Cetorhinus maximus (basking shark)
+# Isurus oxyrinchus (shortfin mako)
+# Mustelus canis (smooth dogfish)
+# Lamna nasus (porbeagle)
+# Squalus acanthias (spurdog)
+# Carcharias taurus (sand tiger shark)
+# Carcharhinus plumbeus (sandbar shark)
+# Carcharodon carcharias (great white shark)
+# Prionace glauca (blue shark)
+# Carcharhinus obscurus (dusky shark)
+# Sphyrnidae (hammerhead sharks - family)
+# Carcharhinidae (requiem sharks - family)
 ```
 
 
