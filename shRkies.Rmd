@@ -17,10 +17,21 @@ library(data.table)
 
 Does change in surface water temperature affect shark migration patterns?
 
-```{r}
-tigershark <- read.csv("Regularized_tiger_shark_tracks.csv")
-view(tigershark) #years range: 2010-2019
+# Delineating the area of interest:
 
+Used "measure a distance" tool in google maps to determine a rectangle encompassing the region we were interested in (see screenshot) Bottom left coordinates: 41.02923, -71.72927 Top left coordinates: 45.11812, -71.74585 Top right coordinates: 45.11812, -66.06430 Bottom right coordinates: 40.99269, -66.12886
+
+![Screenshot of region of interest](northeastregion.png)
+# Determining species that are migratory and pass through this region:
+
+```{r finding potential species}
+potspp <- occ_data(scientificName = "Elasmobranchii", basisOfRecord = "HUMAN_OBSERVATION", year = "2000","2023", )
+potspp
+```
+
+
+
+```{r}
 spp <- c("Carcharodon carcharias", "Galeocerdo cuvier", "Carcharinus leucas")
 y <- paste0("1990",",","2019")
 m <- paste0("6",",","10")
