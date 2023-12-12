@@ -64,10 +64,10 @@ Carcharhinus obscurus (dusky shark)
 
 
 
-```{r}
+```{r, cache = TRUE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
-m <- paste0("5",",","9")
+m <- paste0("5",",","8")
 
 dat.l <-list()
 
@@ -92,11 +92,45 @@ dat%>%
 
 ```
 
-```{r spatial analysis}
+```{r assumed migration path}
 
 ```
 
+``` {r when arrival}
+#let's find the day? for which 25% of each spp has arrived to the area
+#need:
+  #total # individuals for each spp for each year for our time frame
+  #model arrival process as a logistic curve
+
+cm <- dat %>%
+  filter(species == "Cetorhinus maximus") %>%
+  group_by(year) %>%
+  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
+         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
+  group_by(species, year, j.day, date) %>%
+  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
+  group_by(species, year) %>%
+  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
+  filter(year>1999)
+
+cm %>%
+  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not super logistic looking curves (after 2015/2016)
+
+sa <- dat %>%
+  filter(species == "Squalus acanthias") %>%
+  group_by(year) %>%
+  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
+         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
+  group_by(species, year, j.day, date) %>%
+  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
+  group_by(species, year) %>%
+  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
+  filter(year>1999)
+
+sa %>%
+  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not logistic looking either
+
+```
 
 ## References
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
