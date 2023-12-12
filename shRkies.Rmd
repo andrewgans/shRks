@@ -67,7 +67,7 @@ Carcharhinus obscurus (dusky shark)
 ```{r, cache = TRUE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
-m <- paste0("5",",","8")
+m <- paste0("5",",","10")
 
 dat.l <-list()
 
