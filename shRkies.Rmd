@@ -12,6 +12,8 @@ library(tidyverse)
 library(MuMIn)
 library(rgbif)
 library(data.table)
+library(ggmap)
+
 ```
 
 #Question:
@@ -130,6 +132,109 @@ sa <- dat %>%
 sa %>%
   ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not logistic looking either
 
+```
+
+```{r}
+library(lubridate) # Useful functions for dealing with dates
+library(tidync) # For easily dealing with NetCDF data
+library(rerddap) # For easily downloading subsets of data
+library(sf) # For spatial matching
+library(rgeos) # Ibid
+library(ggOceanMaps) # Great for ocean maps
+#devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
+library(ggOceanMaps) # Great for ocean maps
+library(foreach) #for faster sf computing
+library(doParallel) # ibid
+
+
+# The information for the NOAA OISST data
+rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
+
+
+if(F){ #if you want to run this, change F to T
+  
+OISST_dat <- griddap(datasetx = "ncdcOisst21Agg_LonPM180", 
+                       url = "https://coastwatch.pfeg.noaa.gov/erddap", 
+                       time = c('2016-01-01','2022-12-31'), 
+                       zlev = c(0, 0),
+                       latitude = c(41, 45),
+                       longitude = c(-71, -66),
+                       fields = "sst")$data 
+    
+  saveRDS(OISST_dat,"GoM_SST.RDS") 
+}
+
+
+
+OISST_dat <- readRDS("GoM_SST.RDS")
+sst2 <- OISST_dat %>% 
+  mutate(time = as.Date(stringr::str_remove(time, "T12:00:00Z"))) %>% 
+  rename(
+    decimalLongitude=longitude,
+    decimalLatitude=latitude
+  )
+  
+dat2 <- dat %>% 
+  mutate(date= as.Date(stringr::str_remove(eventDate, "T.*"))) %>% 
+  select(species,date,individualCount,decimalLatitude,decimalLongitude) %>% 
+  mutate(individualCount=ifelse(is.na(individualCount),1,individualCount))
+
+sst2 %>% 
+  select(decimalLongitude,decimalLatitude) %>% 
+  unique %>% 
+  ggplot(aes(decimalLongitude,decimalLatitude))+geom_point()+geom_point(data=dat2)
+
+
+#for a date, pull the sst from closest coordinate
+closest_sst <- function(x,y=sst_sf,date){
+  y2 <- y %>% filter(date==date) 
+  d <- st_distance(x, y2$geometry)
+  return(y2[which.min(d),] %>% pull(sst))
+}
+
+dat_sf <- st_as_sf(dat2, coords = c('decimalLongitude', 'decimalLatitude'), crs = 4326)
+
+sst_sf <- st_as_sf(sst2, coords = c('decimalLongitude', 'decimalLatitude'), crs = 4326)
+
+#could take a very long time!!!
+dat_sf2 <- dat_sf %>% 
+  mutate(record=1:n()) %>% 
+  group_by(record) %>% 
+  mutate(
+    sst = closest_sst(x=geometry,date=date)
+)
+
+dat_sf2 %>%
+  ggplot(aes(sst,individualCount))+geom_point()
+
+
+## Parrallelize this
+
+cl <- makePSOCKcluster(detectCores()-2) # leave two cores for background processes
+
+
+ptm <- proc.time()
+d <- foreach(i=unique(dat_sf$species), .combine = rbind, .packages=c("tidyverse","sf") ) %dopar%  {
+
+dat_sf %>%
+    filter(species==i) %>% 
+  mutate(record=1:n()) %>% 
+  filter(record<101) %>% #omit this line to do all records of all species
+  group_by(record) %>% 
+  mutate(
+    sst = closest_sst(x=geometry,date=date)
+) 
+}
+proc.time() - ptm
+stopCluster(cl)
+
+  #374 species took 3000 s. Be aware!!
+ # user   system  elapsed 
+ #   4.807    4.095 3012.390 
+
+#plot
+gom <- basemap( limits=c(-71, -66, 41, 45))
+gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
 ```
 
 ## References
