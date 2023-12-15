@@ -134,7 +134,7 @@ sa %>%
 
 ```
 
-```{r}
+```{r, cache = T}
 library(lubridate) # Useful functions for dealing with dates
 library(tidync) # For easily dealing with NetCDF data
 library(rerddap) # For easily downloading subsets of data
