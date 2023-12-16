@@ -168,7 +168,7 @@ library(doParallel) # ibid
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
 
-if(F){ #if you want to run this, change F to T
+if(T){ #if you want to run this, change F to T
   
 OISST_dat <- griddap(datasetx = "ncdcOisst21Agg_LonPM180", 
                        url = "https://coastwatch.pfeg.noaa.gov/erddap", 
