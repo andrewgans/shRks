@@ -25,7 +25,9 @@ Does change in surface water temperature affect shark migration patterns?
 
 # Methods:
 
-The area of interest was identified and then delineated using the 'measure a distance' tool in Google Maps (\@ citation?). This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. 
+The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps (\@ citation?). This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
+
+Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
 
 # Results:
 
@@ -251,5 +253,7 @@ stopCluster(cl)
 gom <- basemap( limits=c(-71, -66, 41, 45))
 gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
 ```
+
+# Discussion:
 
 ## References
