@@ -1,6 +1,6 @@
 ---
-title: "sharkie"
-author: "shRks"
+title: "Shark Migration and Surface Temperature"
+author: "Andrew Gans, Ana Pirosca, Jaan Selod, Ava Skogstrom"
 date: "2023-12-04"
 output: html_document
 bibliography: "shRks.bib"
@@ -13,28 +13,47 @@ library(MuMIn)
 library(rgbif)
 library(data.table)
 library(ggmap)
+library(knitr)
 
 ```
 
-#Question:
+# Introduction:
 
-Does change in surface water temperature affect shark migration patterns? 
+Question:
 
-# Delineating the area of interest:
+Does change in surface water temperature affect shark migration patterns?
 
-Used "measure a distance" tool in google maps to determine a rectangle encompassing the region we were interested in (see screenshot) Bottom left coordinates: 41.02923, -71.72927 Top left coordinates: 45.11812, -71.74585 Top right coordinates: 45.11812, -66.06430 Bottom right coordinates: 40.99269, -66.12886
+# Methods:
 
-![Screenshot of region of interest](northeastregion.png)
+The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps (\@ citation?). This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
 
-## Determining species that are migratory and pass through this region:
+Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
 
-```{r finding potential species, include = FALSE}
+# Results:
+
+```{r area of interest, echo = FALSE, message = FALSE, warning = FALSE}
+
+name <- c("low_left","top_left","top_right","low_right")
+lat <- c(41.02923, 45.11812, 45.11812, 40.99269) %>%
+  round()
+long <- c(-71.72927, -71.74585, -66.06430, -66.12886) %>%
+  round()
+area_coords <- data.frame(name,lat,long)
+
+kable(area_coords, caption = 
+        "Table 1: Rounded Coordinates for Region of Interest")
+```
+
+![Figure 1: Screenshot of region of interest](northeastregion.png)
+
+
+```{r finding potential migratory species, include = FALSE}
 
 potspp <- occ_data(scientificName = "Elasmobranchii", 
                    basisOfRecord = "HUMAN_OBSERVATION", 
                    year = "2000,2023",
                    decimalLatitude = "41.0,45.0", 
-                   decimalLongitude = "-71.0,-66.0", 
+                   decimalLongitude = "-72.0,-66.0", 
                    )[[2]]
 potspp %>%
   select(scientificName) %>%
@@ -64,8 +83,6 @@ Prionace glauca (blue shark)
 
 Carcharhinus obscurus (dusky shark)
 
-
-
 ```{r, cache = TRUE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
@@ -80,7 +97,7 @@ dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
                                limit=1000, country="US",
                                basisOfRecord = "HUMAN_OBSERVATION", 
                                decimalLatitude = "41.0,45.0", 
-                               decimalLongitude = "-71.0,-66.0", 
+                               decimalLongitude = "-72.0,-66.0", 
                    )[[2]]
 
 }
@@ -98,7 +115,7 @@ dat%>%
 
 ```
 
-``` {r when arrival}
+```{r when arrival}
 #let's find the day? for which 25% of each spp has arrived to the area
 #need:
   #total # individuals for each spp for each year for our time frame
@@ -158,7 +175,7 @@ OISST_dat <- griddap(datasetx = "ncdcOisst21Agg_LonPM180",
                        time = c('2016-01-01','2022-12-31'), 
                        zlev = c(0, 0),
                        latitude = c(41, 45),
-                       longitude = c(-71, -66),
+                       longitude = c(-72, -66),
                        fields = "sst")$data 
     
   saveRDS(OISST_dat,"GoM_SST.RDS") 
@@ -237,5 +254,6 @@ gom <- basemap( limits=c(-71, -66, 41, 45))
 gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
 ```
 
-## References
+# Discussion:
 
+## References
