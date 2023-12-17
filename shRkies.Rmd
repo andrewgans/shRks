@@ -14,7 +14,15 @@ library(rgbif)
 library(data.table)
 library(ggmap)
 library(knitr)
-
+library(lubridate) # Useful functions for dealing with dates
+library(tidync) # For easily dealing with NetCDF data
+library(rerddap) # For easily downloading subsets of data
+library(sf) # For spatial matching
+library(rgeos) # Ibid
+library(ggOceanMaps) # Great for ocean maps
+#devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
+library(foreach) #for faster sf computing
+library(doParallel) # ibid
 ```
 
 # Introduction:
@@ -75,7 +83,7 @@ Occurence data indicated that a number of shark species have been identified in 
 
 ## 2. [...]
 
-```{r, cache = TRUE}
+```{r cache=FALSE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
 m <- paste0("5",",","10")
@@ -105,18 +113,6 @@ dat%>%
 
 
 ```{r, cache = T}
-library(lubridate) # Useful functions for dealing with dates
-library(tidync) # For easily dealing with NetCDF data
-library(rerddap) # For easily downloading subsets of data
-library(sf) # For spatial matching
-library(rgeos) # Ibid
-library(ggOceanMaps) # Great for ocean maps
-#devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
-library(ggOceanMaps) # Great for ocean maps
-library(foreach) #for faster sf computing
-library(doParallel) # ibid
-
-
 # The information for the NOAA OISST data
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
