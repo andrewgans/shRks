@@ -75,7 +75,6 @@ migspp <- data.frame(scientific_name,common_name)
 
 kable(migspp, caption = 
         "Table 2: Migratory Shark Species in the Area of Interest")
-
 ```
 
 Occurence data indicated that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration).
@@ -103,12 +102,6 @@ dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
 }
 
 dat <- rbindlist(dat.l,fill=T)
-
-dat%>%
-  group_by(year,species)%>%
-  summarise(count=sum(individualCount,na.rm = T))%>%
-  ggplot(aes(x=year,y=count,col=species))+geom_point()
-
 ```
 
 
