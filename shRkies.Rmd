@@ -14,23 +14,35 @@ library(rgbif)
 library(data.table)
 library(ggmap)
 library(knitr)
-
+library(lubridate) # Useful functions for dealing with dates
+library(tidync) # For easily dealing with NetCDF data
+library(rerddap) # For easily downloading subsets of data
+library(sf) # For spatial matching
+library(rgeos) # Ibid
+library(ggOceanMaps) # Great for ocean maps
+#devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
+library(foreach) #for faster sf computing
+library(doParallel) # ibid
 ```
 
 # Introduction:
 
-Question:
+Shark migration patterns are incredibly important for the survival and the health of marine ecosystems. Aside from serving as 'flagship species' that facilitate the raising of awareness and financial support for conservation of coral reefs and marine life, sharks also operate as top predators that can initiate trophic cascades according to @HEITHAUS2008202. Trophic cascades are vital for controlling relative populations of other species down the food chain and therefore affect the natural sources of food--often related directly to health and biodiversity of the entire ecosystem.
 
-Does change in surface water temperature affect shark migration patterns?
+However, rising surface water temperatures, a stark reality of climate change, has already significantly affected marine life. Previous research has established the undeniable link between warming waters and altered shark behavior. Studies by @Pistevos2015 suggest that growing ocean acidification and global warming can impair shark hunting and growth, potentially resulting in dangerous trophic cascades. This can have potentially catastrophic implication for regions where water is heating up significantly year to year. For example, the New England region recorded warming water temperatures up to 3 degrees Fahrenheit since 1901 according to @Peery2019.
+
+There is little understood about the migratory patterns of sharks in the northeastern regions as temperature of water rise. Which begs the question: How exactly does surface water temperature influence shark migration patterns? In order to answer this question we combined observed data of shark migratory patterns over time with information about temperature of water over a specified area of the Northeastern region. Using statistical analysis we were able to observe the impact of drastically increasing water temperatures on shark behavior across 10 different species in order to understand the universal relationship on shark behavior.
+
 
 # Methods:
 
-The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps (\@ citation?). This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
+The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps. This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
 
 Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
 
 # Results:
 
+## 1. Identifying Species and Area of Interest:
 ```{r area of interest, echo = FALSE, message = FALSE, warning = FALSE}
 
 name <- c("low_left","top_left","top_right","low_right")
@@ -46,6 +58,7 @@ kable(area_coords, caption =
 
 ![Figure 1: Screenshot of region of interest](northeastregion.png)
 
+The region of interest was identified as approximately the Gulf of Maine, as visible in Figure 1. 
 
 ```{r finding potential migratory species, include = FALSE}
 
@@ -55,35 +68,23 @@ potspp <- occ_data(scientificName = "Elasmobranchii",
                    decimalLatitude = "41.0,45.0", 
                    decimalLongitude = "-72.0,-66.0", 
                    )[[2]]
-potspp %>%
-  select(scientificName) %>%
-  unique() %>%
-  print()
+
+scientific_name <- c("Cetorhinus maximus", "Isurus oxyrinchus","Mustelus canis","Lamna nasus","Squalus acanthias","Carcharias taurus","Carcharinus plumbeus","Carcharodon carcharias","Prionace glauca","Carcharinus obscurus")
+common_name <- c("basking shark", "shortfin mako", "smooth dogfish","porbeagle","spurdog","sand tiger shark","sandbar shark","white shark","blue shark","dusky shark")
+migspp <- data.frame(scientific_name,common_name)
+
+kable(migspp, caption = 
+        "Table 2: Migratory Shark Species in the Area of Interest")
 ```
 
-#### Occurence data indicates that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration):
+Occurence data indicated that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration).
 
-Cetorhinus maximus (basking shark)
 
-Isurus oxyrinchus (shortfin mako)
+## 2. Spatial Analysis of Shark Migration
 
-Mustelus canis (smooth dogfish)
+The observations were further filtered by months during which sharks migrate into the area, namely during late spring to late summer (we specified between May and October agccording to @NOAAmigration). 
 
-Lamna nasus (porbeagle)
-
-Squalus acanthias (spurdog)
-
-Carcharias taurus (sand tiger shark)
-
-Carcharhinus plumbeus (sandbar shark)
-
-Carcharodon carcharias (great white shark)
-
-Prionace glauca (blue shark)
-
-Carcharhinus obscurus (dusky shark)
-
-```{r, cache = TRUE}
+```{r cache=FALSE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
 m <- paste0("5",",","10")
@@ -103,67 +104,10 @@ dat.l[[paste0(s)]] <- occ_data(scientificName = s,year=y,month=m,
 }
 
 dat <- rbindlist(dat.l,fill=T)
-
-dat%>%
-  group_by(year,species)%>%
-  summarise(count=sum(individualCount,na.rm = T))%>%
-  ggplot(aes(x=year,y=count,col=species))+geom_point()
-
 ```
 
-```{r assumed migration path}
-
-```
-
-```{r when arrival}
-#let's find the day? for which 25% of each spp has arrived to the area
-#need:
-  #total # individuals for each spp for each year for our time frame
-  #model arrival process as a logistic curve
-
-cm <- dat %>%
-  filter(species == "Cetorhinus maximus") %>%
-  group_by(year) %>%
-  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
-         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
-  group_by(species, year, j.day, date) %>%
-  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
-  group_by(species, year) %>%
-  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
-  filter(year>1999)
-
-cm %>%
-  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not super logistic looking curves (after 2015/2016)
-
-sa <- dat %>%
-  filter(species == "Squalus acanthias") %>%
-  group_by(year) %>%
-  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
-         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
-  group_by(species, year, j.day, date) %>%
-  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
-  group_by(species, year) %>%
-  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
-  filter(year>1999)
-
-sa %>%
-  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not logistic looking either
-
-```
 
 ```{r, cache = T}
-library(lubridate) # Useful functions for dealing with dates
-library(tidync) # For easily dealing with NetCDF data
-library(rerddap) # For easily downloading subsets of data
-library(sf) # For spatial matching
-library(rgeos) # Ibid
-library(ggOceanMaps) # Great for ocean maps
-#devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
-library(ggOceanMaps) # Great for ocean maps
-library(foreach) #for faster sf computing
-library(doParallel) # ibid
-
-
 # The information for the NOAA OISST data
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
