@@ -28,12 +28,13 @@ There is little understood about the migratory patterns of sharks in the northea
 
 # Methods:
 
-The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps (\@ citation?). This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
+The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps. This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
 
 Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
 
 # Results:
 
+## 1. Identifying Species and Area of Interest:
 ```{r area of interest, echo = FALSE, message = FALSE, warning = FALSE}
 
 name <- c("low_left","top_left","top_right","low_right")
@@ -49,6 +50,7 @@ kable(area_coords, caption =
 
 ![Figure 1: Screenshot of region of interest](northeastregion.png)
 
+The region of interest was identified as approximately the Gulf of Maine, as visible in Figure 1. 
 
 ```{r finding potential migratory species, include = FALSE}
 
@@ -58,33 +60,20 @@ potspp <- occ_data(scientificName = "Elasmobranchii",
                    decimalLatitude = "41.0,45.0", 
                    decimalLongitude = "-72.0,-66.0", 
                    )[[2]]
-potspp %>%
-  select(scientificName) %>%
-  unique() %>%
-  print()
+
+scientific_name <- c("Cetorhinus maximus", "Isurus oxyrinchus","Mustelus canis","Lamna nasus","Squalus acanthias","Carcharias taurus","Carcharinus plumbeus","Carcharodon carcharias","Prionace glauca","Carcharinus obscurus")
+common_name <- c("basking shark", "shortfin mako", "smooth dogfish","porbeagle","spurdog","sand tiger shark","sandbar shark","white shark","blue shark","dusky shark")
+migspp <- data.frame(scientific_name,common_name)
+
+kable(migspp, caption = 
+        "Table 2: Migratory Shark Species in the Area of Interest")
+
 ```
 
-#### Occurence data indicates that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration):
+Occurence data indicated that a number of shark species have been identified in our region of interest since 2000. Using information from the National Oceanic and Atmospheric Administration, we can narrow down the list of species to those that exhibit migratory behavior between the area of interest and the mid-Atlantic/Southeast waters (@NOAAmigration).
 
-Cetorhinus maximus (basking shark)
 
-Isurus oxyrinchus (shortfin mako)
-
-Mustelus canis (smooth dogfish)
-
-Lamna nasus (porbeagle)
-
-Squalus acanthias (spurdog)
-
-Carcharias taurus (sand tiger shark)
-
-Carcharhinus plumbeus (sandbar shark)
-
-Carcharodon carcharias (great white shark)
-
-Prionace glauca (blue shark)
-
-Carcharhinus obscurus (dusky shark)
+## 2. [...]
 
 ```{r, cache = TRUE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
@@ -114,45 +103,6 @@ dat%>%
 
 ```
 
-```{r assumed migration path}
-
-```
-
-```{r when arrival}
-#let's find the day? for which 25% of each spp has arrived to the area
-#need:
-  #total # individuals for each spp for each year for our time frame
-  #model arrival process as a logistic curve
-
-cm <- dat %>%
-  filter(species == "Cetorhinus maximus") %>%
-  group_by(year) %>%
-  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
-         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
-  group_by(species, year, j.day, date) %>%
-  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
-  group_by(species, year) %>%
-  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
-  filter(year>1999)
-
-cm %>%
-  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not super logistic looking curves (after 2015/2016)
-
-sa <- dat %>%
-  filter(species == "Squalus acanthias") %>%
-  group_by(year) %>%
-  mutate(date = as.Date(paste0(year,"-",month,"-",day)),
-         j.day = julian(date, origin = as.Date(paste0(unique(year),"-01-01")))) %>%
-  group_by(species, year, j.day, date) %>%
-  summarise(day.tot = sum(individualCount,na.rm=T)) %>%
-  group_by(species, year) %>%
-  mutate(prop = cumsum(day.tot/sum(day.tot,na.rm = T))) %>%
-  filter(year>1999)
-
-sa %>%
-  ggplot(aes(j.day,prop))+geom_point()+facet_wrap(year~.) #not logistic looking either
-
-```
 
 ```{r, cache = T}
 library(lubridate) # Useful functions for dealing with dates
