@@ -23,6 +23,7 @@ library(ggOceanMaps) # Great for ocean maps
 #devtools::install_github("MikkoVihtakari/ggOceanMapsData") # required by ggOceanMaps
 library(foreach) #for faster sf computing
 library(doParallel) # ibid
+library(lme4)
 ```
 
 # Introduction:
@@ -201,7 +202,9 @@ result_tibble <- st_join(dat2_sf, dataq_sf, by = c("decimalLatitude" = "latitude
 result_tibble
 ```
 
-
+```{r modeling, echo = F}
+model <- lmer(individualCount ~ sst + (1 | species), data = result_tibble) #idk if we should be predicting individual count tho
+```
 
 
 
