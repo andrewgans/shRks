@@ -102,7 +102,7 @@ dat <- rbindlist(dat.l,fill=T)
 ```
 
 
-```{r, SST Datacache = T}
+```{r, SST Data, cache = T}
 # The information for the NOAA OISST data
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
@@ -153,18 +153,6 @@ dat_sf <- st_as_sf(dat2, coords = c('decimalLongitude', 'decimalLatitude'), crs 
 
 sst_sf <- st_as_sf(sst2, coords = c('decimalLongitude', 'decimalLatitude'), crs = 4326)
 
-#could take a very long time!!!
-dat_sf2 <- dat_sf %>% 
-  mutate(record=1:n()) %>% 
-  group_by(record) %>% 
-  mutate(
-    sst = closest_sst(x=geometry,date=date)
-)
-
-dat_sf2 %>%
-  ggplot(aes(sst,individualCount))+geom_point()
-
-
 ## Parrallelize this
 
 cl <- makePSOCKcluster(detectCores()-2) # leave two cores for background processes
@@ -205,7 +193,7 @@ newSSTDdata <- readRDS("GoM_SST.RDS")
 
 # Convert dat2 and dataq to sf objects
 dat2_sf <- st_as_sf(dat2, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
-dataq_sf <- st_as_sf(dataq, coords = c("longitude", "latitude"), crs = 4326)
+dataq_sf <- st_as_sf(newSSTDdata, coords = c("longitude", "latitude"), crs = 4326)
 
 # Perform a spatial join based on latitude
 result_tibble <- st_join(dat2_sf, dataq_sf, by = c("decimalLatitude" = "latitude"), join = st_nearest_feature)
