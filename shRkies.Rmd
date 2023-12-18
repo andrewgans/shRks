@@ -79,7 +79,7 @@ Occurence data indicated that a number of shark species have been identified in 
 
 ## 2. Spatial Analysis of Shark Migration:
 
-The observations were further filtered by months during which sharks migrate into the area, namely during late spring to late summer (we specified between May and October agccording to @NOAAmigration).
+The observations were further filtered by months during which sharks migrate into the area, namely during late spring to late summer (we specified between May and October according to @NOAAmigration).
 ```{r, cache = FALSE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
