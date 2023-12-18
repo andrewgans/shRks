@@ -24,6 +24,7 @@ library(ggOceanMaps) # Great for ocean maps
 library(foreach) #for faster sf computing
 library(doParallel) # ibid
 library(lme4)
+library(car)
 ```
 
 # Introduction:
@@ -204,11 +205,13 @@ result_tibble
 
 ```{r modeling, echo = F}
 model <- lmer(individualCount ~ sst + (1 | species), data = result_tibble) #idk if we should be predicting individual count tho
+Anova(model) 
 ```
 
 
 
 # Discussion:
 
+If SST not a predictor --> maybe other factors (ocean acidification, prey migration, human activity, sea temperature but not surface etc.) that aren't directly correlated to sea SURFACE temperature
 
 ## References
