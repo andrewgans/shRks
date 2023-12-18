@@ -200,6 +200,10 @@ dataq_sf <- st_as_sf(newSSTDdata, coords = c("longitude", "latitude"), crs = 432
 # Perform a spatial join based on latitude
 result_tibble <- st_join(dat2_sf, dataq_sf, by = c("decimalLatitude" = "latitude"), join = st_nearest_feature)
 
+result_tibble <- result_tibble %>% 
+  mutate(julian_day = yday(as.Date(date)))
+
+
 result_tibble
 ```
 
