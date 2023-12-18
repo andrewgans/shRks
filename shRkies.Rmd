@@ -36,8 +36,7 @@ There is little understood about the migratory patterns of sharks in the northea
 
 # Methods:
 
-The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps. This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species. [...]
-
+The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps. This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species.
 Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
 
 # Results:
@@ -108,7 +107,7 @@ dat <- rbindlist(dat.l,fill=T)
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
 
-if(T){ #if you want to run this, change F to T
+if(F){ #if you want to run this, change F to T
   
 OISST_dat <- griddap(datasetx = "ncdcOisst21Agg_LonPM180", 
                        url = "https://coastwatch.pfeg.noaa.gov/erddap", 
@@ -191,7 +190,7 @@ stopCluster(cl)
  #   4.807    4.095 3012.390 
 
 #plot
-gom <- basemap( limits=c(-71, -66, 41, 45))
+gom <- basemap( limits=c(-72, -66, 41, 45))
 gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
 
 ```
