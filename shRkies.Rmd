@@ -102,7 +102,7 @@ dat <- rbindlist(dat.l,fill=T)
 ```
 
 
-```{r, cache = T}
+```{r, SST Datacache = T}
 # The information for the NOAA OISST data
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
@@ -199,6 +199,9 @@ gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
 ```{r Spatial Join Code}
 # Assuming dat2 and dataq are your tibbles with coordinates and temperatures
 # and dat2 has "decimalLongitude" and "decimalLatitude" columns
+
+newSSTDdata <- readRDS("GoM_SST.RDS")
+
 
 # Convert dat2 and dataq to sf objects
 dat2_sf <- st_as_sf(dat2, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
