@@ -208,7 +208,7 @@ result_tibble
 ```
 
 ```{r modeling, echo = F}
-model <- lmer(individualCount ~ sst + (1 | species), data = result_tibble) #idk if we should be predicting individual count tho
+model <- lmer(julian_day ~ sst + (1 | species), data = result_tibble) #idk if we should be predicting individual count tho
 Anova(model) 
 ```
 
