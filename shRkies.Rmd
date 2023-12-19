@@ -196,7 +196,7 @@ result_tibble <- result_tibble %>%
 
 Once the coordinate and temperature data were merged, a linear mixed effects model was produced to evaluate the prediction relationship between sea surface temperature and Julian day (marking species as an 'effect'). The fit of this model to the data was examined using analysis of variance (ANOVA), resulting in a very significant p-value of 2.2e-16.
 
-```{r modeling, echo = F}
+```{r modeling, echo = F, message = F, warning = F}
 model <- lmer(julian_day ~ sst + (1 | species), data = result_tibble)
 Anova(model)
 ```
