@@ -122,8 +122,6 @@ OISST_dat <- griddap(datasetx = "ncdcOisst21Agg_LonPM180",
   saveRDS(OISST_dat,"GoM_SST.RDS") 
 }
 
-
-
 OISST_dat <- readRDS("GoM_SST.RDS")
 sst2 <- OISST_dat %>% 
   mutate(time = as.Date(stringr::str_remove(time, "T12:00:00Z"))) %>% 
@@ -172,14 +170,15 @@ stopCluster(cl)
 
 
 #plot
-gom <- basemap( limits=c(-72, -66, 41, 45))
-gom+geom_sf(data=d ,aes(col=sst))+facet_wrap(.~species)
+gom <- basemap(limits=c(-72, -66, 41, 45), rotate = T)
+gom + geom_sf(data=d,aes(col=sst)) + facet_wrap(.~species) + labs(col = "Sea Surface Temperature (ºC)") + ggtitle("Figure 2: Observation Data with Corresponding Sea Surface Temperature per Species")
+
 
 ```
+Figure 2 illustrates how for most species of interest, sea surface temperatures around 8ºC to 10ºC are associated with observation data. It can be hypothesized that as the sea surface temperature increases, the observation counts for each species decrease because warmer temperatures do not allow for the proper survival conditions.
 
-
-```{r Spatial Join Code}
-# Assuming dat2 and dataq are your tibbles with coordinates and temperatures
+```{r Spatial Join Code, echo = F, message = F, warning = F}
+# dat2 and dataq are tibbles with coordinates and temperatures
 # and dat2 has "decimalLongitude" and "decimalLatitude" columns
 
 newSSTDdata <- readRDS("GoM_SST.RDS")
@@ -194,16 +193,14 @@ result_tibble <- st_join(dat2_sf, dataq_sf, by = c("decimalLatitude" = "latitude
 
 result_tibble <- result_tibble %>% 
   mutate(julian_day = yday(as.Date(date)))
-
-
-result_tibble
 ```
+
+Once the coordinate and temperature data were merged, a linear mixed effects model was produced to evaluate the prediction relationship between sea surface temperature and Julian day (marking species as an 'effect'). The fit of this model to the data was examined using analysis of variance (ANOVA), resulting in a very significant p-value of 2.2e-16. 
 
 ```{r modeling, echo = F}
-model <- lmer(julian_day ~ sst + (1 | species), data = result_tibble) #idk if we should be predicting individual count tho
-Anova(model) 
+model <- lmer(julian_day ~ sst + (1 | species), data = result_tibble)
+Anova(model)
 ```
-
 
 
 # Discussion:
