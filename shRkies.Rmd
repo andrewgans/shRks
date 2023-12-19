@@ -203,8 +203,14 @@ Anova(model)
 
 # Discussion:
 
-If SST not a predictor --\> maybe other factors (ocean acidification, prey migration, human activity, sea temperature but not surface etc.) that aren't directly correlated to sea SURFACE temperature
+According to our best linear mixed-effects model, sea surface temperature is a significant predictor of human observations represented by the date of the observation, as opposed to the number of counts for each species of interest. Referring to Figure 2, the general trend demonstrated by our selected species showed a preference for areas with sea surface temperatures around 8ºC to 10ºC. We now understand that there is a direct relationship between the two, and that our shark species are more likely to be observed via human observation in areas with relatively cooler sea surface temperatures when compared to the larger surrounding area. 
+
+Generally, marine species such as sharks tend to shift or expand towards the poles in response to rising ocean temperatures [@Hammerschlag2022]. Some shark species have shown earlier arrival times to northern latitudes, and are being caught earlier in the year and at higher densities more towards the poles [@Hammerschlag2022]. While some temperate marine species, like our shark species of interest, are able to tolerate temporary broad fluctuations in temperature within their immediate surroundings, they will suffer severe physiological costs over time if these temperature changes persist [@Spurgeon2022]. While their migratory habits have allowed them to seek out more favorable conditions within their thermal preferences, these shark species are faced with increasingly warmer sea surface temperatures, ultimately pushing them further towards the poles or to deeper waters. 
+
+If we were to continue with this analysis, it may be beneficial to account for migration patterns of prey or if there is a correlation to fishing activity. In regard to the effects of climate change, additional factors affecting shark migratory patterns may be ocean acidification, sea temperature, and the changing durations of cooling and warming periods in different parts of the ocean.
 
 # Author Contributions:
+
+Ana wrote the introduction and contributed to the bibliography, Ava wrote the discussion and contributed to the bibliography, Andrew and Jaan collaborated on the results (including narrative) and methods, and also contributed to the bibliography.
 
 # References
