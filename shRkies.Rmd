@@ -39,7 +39,7 @@ There is little understood about the migratory patterns of sharks in the northea
 # Methods:
 
 The area of interest, encompassing approximately the Gulf of Maine region, was identified and then delineated using the 'measure a distance' tool in Google Maps. This defined four sets of latitude and longitude coordinates, which were subsequently rounded to the nearest integer for ease of analysis. Occurrence data from the Global Biodiversity Information Facility (GBIF) was filtered to obtain all human Elasmobranchii observations in the area of interest between 2000 and 2023, then further filtered to include migratory shark species.
-Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. 
+Sea surface temperature data was retrieved from the National Oceanic and Atmospheric Administration (NOAA)'s Optimum Interpolation Sea Surface Temperature (OISST) dataset by Dr. Kenaley, extracting data from the region of interest. Spatial analysis for temperature was merged with observations to conduct linear mixed effects modeling and subsequently analysis of variance on the data and model predictions.
 
 # Results:
 
@@ -60,7 +60,7 @@ kable(area_coords, caption =
 ![Figure 1: Screenshot of region of interest](northeastregion.png)
 
 
-```{r finding potential migratory species, include = FALSE}
+```{r finding potential migratory species, echo = F, message=F, warning = F}
 
 potspp <- occ_data(scientificName = "Elasmobranchii", 
                    basisOfRecord = "HUMAN_OBSERVATION", 
@@ -81,7 +81,7 @@ Occurence data indicated that a number of shark species have been identified in 
 ## 2. Spatial Analysis of Shark Migration:
 
 The observations were further filtered by months during which sharks migrate into the area, namely during late spring to late summer (we specified between May and October according to @NOAAmigration).
-```{r, cache = FALSE}
+```{r, cache = FALSE, echo = FALSE, warning = FALSE, message = FALSE}
 spp <- c("Cetorhinus maximus","Isurus oxyrhinchus","Mustelus canus", "Lamna nasus", "Squalus acanthias", "Carcharias taurus", "Carcharhinus plumbeus", "Carcharodon carcharias", "Prionace glauca", "Carcharhinus obscurus")
 y <- paste0("2000",",","2023")
 m <- paste0("5",",","10")
@@ -104,7 +104,7 @@ dat <- rbindlist(dat.l,fill=T)
 ```
 
 
-```{r, SST Data, cache = T}
+```{r SST Data, cache = T, echo = F, warning = F, message = F}
 # The information for the NOAA OISST data
 rerddap::info(datasetid = "ncdcOisst21Agg_LonPM180", url = "https://coastwatch.pfeg.noaa.gov/erddap/")
 
@@ -136,11 +136,6 @@ dat2 <- dat %>%
   mutate(date= as.Date(stringr::str_remove(eventDate, "T.*"))) %>% 
   select(species,date,individualCount,decimalLatitude,decimalLongitude) %>% 
   mutate(individualCount=ifelse(is.na(individualCount),1,individualCount))
-
-sst2 %>% 
-  select(decimalLongitude,decimalLatitude) %>% 
-  unique %>% 
-  ggplot(aes(decimalLongitude,decimalLatitude))+geom_point()+geom_point(data=dat2)
 
 
 #for a date, pull the sst from closest coordinate
@@ -175,9 +170,6 @@ dat_sf %>%
 proc.time() - ptm
 stopCluster(cl)
 
-  #374 species took 3000 s. Be aware!!
- # user   system  elapsed 
- #   4.807    4.095 3012.390 
 
 #plot
 gom <- basemap( limits=c(-72, -66, 41, 45))
@@ -218,4 +210,6 @@ Anova(model)
 
 If SST not a predictor --> maybe other factors (ocean acidification, prey migration, human activity, sea temperature but not surface etc.) that aren't directly correlated to sea SURFACE temperature
 
-## References
+# Author Contributions:
+
+# References
